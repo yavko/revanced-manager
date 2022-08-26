@@ -13,4 +13,6 @@
     <string name="updates_available">Available updates</string>
     <string name="expand">Expand</string>
     <string name="update">Update</string>
+    <string name="theme">Theme</string>
+    <string name="apply">Apply</string>
 </resources>

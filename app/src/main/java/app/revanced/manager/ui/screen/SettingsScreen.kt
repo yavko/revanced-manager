@@ -1,26 +1,23 @@
 package app.revanced.manager.ui.screen
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.NavigateBefore
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.revanced.manager.R
+import app.revanced.manager.preferences.PreferencesManager
 import app.revanced.manager.ui.component.SocialItem
-import app.revanced.manager.ui.navigation.AppDestination
+import app.revanced.manager.ui.theme.Theme
 import app.revanced.manager.ui.viewmodel.SettingsViewModel
-import com.xinto.taxi.BackstackNavigator
+import org.koin.androidx.compose.get
 import org.koin.androidx.compose.getViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,6 +32,18 @@ fun SettingsScreen(viewModel: SettingsViewModel = getViewModel()) {
             .verticalScroll(state = rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+
+        if (viewModel.showThemePicker) {
+            ThemePicker(
+                onDismissRequest = viewModel::dismissThemePicker,
+                onConfirm = viewModel::setTheme
+            )
+        }
+        ListItem(
+            modifier = Modifier.clickable { viewModel.showThemePicker() },
+            headlineText = { Text(stringResource(R.string.theme)) }
+        )
+
         ListItem(
             modifier = Modifier.clickable { prefs.dynamicColor = !prefs.dynamicColor },
             headlineText = { Text(stringResource(R.string.dynamic_color)) },
@@ -49,4 +58,50 @@ fun SettingsScreen(viewModel: SettingsViewModel = getViewModel()) {
         Divider()
         SocialItem(R.string.github, Icons.Default.Code, viewModel::openGitHub)
     }
+}
+
+@Composable
+fun ThemePicker(
+    onDismissRequest: () -> Unit,
+    onConfirm: (Theme) -> Unit,
+    prefs: PreferencesManager = get()
+) {
+    var selectedTheme by remember { mutableStateOf(prefs.theme) }
+
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = { Text(stringResource(R.string.theme)) },
+        text = {
+            Column {
+                Theme.values().forEach { theme ->
+                    Row(
+                        modifier = Modifier.clickable { selectedTheme = theme },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            theme.displayName,
+                            style = MaterialTheme.typography.labelLarge
+                        )
+
+                        Spacer(Modifier.weight(1f, true))
+
+                        RadioButton(
+                            selected = theme == selectedTheme,
+                            onClick = { selectedTheme = theme }
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    onConfirm(selectedTheme)
+                    onDismissRequest()
+                }
+            ) {
+                Text(stringResource(R.string.apply))
+            }
+        }
+    )
 }

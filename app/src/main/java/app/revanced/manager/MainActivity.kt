@@ -8,12 +8,15 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.with
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.ui.Modifier
 import app.revanced.manager.preferences.PreferencesManager
 import app.revanced.manager.ui.navigation.AppDestination
 import app.revanced.manager.ui.screen.MainDashboardScreen
 import app.revanced.manager.ui.theme.ReVancedManagerTheme
+import app.revanced.manager.ui.theme.Theme
 import com.xinto.taxi.Taxi
 import com.xinto.taxi.rememberBackstackNavigator
 import org.koin.android.ext.android.inject
@@ -25,7 +28,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ReVancedManagerTheme(dynamicColor = prefs.dynamicColor) {
+            ReVancedManagerTheme(
+                dynamicColor = prefs.dynamicColor,
+                darkTheme = prefs.theme == Theme.SYSTEM && isSystemInDarkTheme() || prefs.theme == Theme.DARK,
+            ) {
                 val navigator = rememberBackstackNavigator<AppDestination>(AppDestination.Dashboard)
 
                 BackHandler {
