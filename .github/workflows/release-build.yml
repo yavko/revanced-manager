@@ -35,3 +35,9 @@ jobs:
           prerelease: false
           automatic_release_tag: "latest"
           files: revanced-manager-$GITHUB_REF_NAME.apk
+      
+      - name: Upload apk as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Apk
+          path: revanced-manager-$GITHUB_REF_NAME.apk
